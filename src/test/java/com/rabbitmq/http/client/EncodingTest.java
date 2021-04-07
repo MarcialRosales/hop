@@ -16,15 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class EncodingTest {
     String queryParameterValue = "^outbound-ack|msg-.+$";
 
     @Test
-    void uriEncodeOfSpecialCharactersWithSpringUriBuilder() {
+    void uriEncodeOfSpecialCharactersWithSpringUriBuilder_DoesNotWork() {
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.TEMPLATE_AND_VALUES);
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("name", queryParameterValue);
 
@@ -32,11 +33,12 @@ public class EncodingTest {
                 .uriString("/exchanges")
                 .queryParams(map)
                 .build();
-        assertEquals("/exchanges?name=%5Eoutbound-ack%7Cmsg-.%2B%24", uri.toASCIIString());
+        assertNotEquals("/exchanges?name=%5Eoutbound-ack%7Cmsg-.%2B%24", uri.toASCIIString());
+
     }
 
     @Test
-    void uriEncodeOfSpecialCharactersWithApacheURIBuilder() throws URISyntaxException {
+    void uriEncodeOfSpecialCharactersWithApacheURIBuilder_DoesWork() throws URISyntaxException {
         URI uri = new URIBuilder()
                 .setPath("/exchanges")
                 .addParameter("name", queryParameterValue)
